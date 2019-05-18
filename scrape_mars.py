@@ -2,148 +2,167 @@ from splinter import Browser
 from bs4 import BeautifulSoup as bs
 import time
 import pandas as pd
+import requests
 
 #Set up the chromedriver path
-executable_path = {'executable_path': 'C:\chromedrv\chromedriver.exe'}
-browser = Browser('chrome', **executable_path, headless=False)
+def init_browser():
+        executable_path = {'executable_path': 'C:\chromedrv\chromedriver.exe'}
+        return Browser('chrome', **executable_path, headless=False)
+        
 
 def scrape():
-    browser = init_browser()
+        browser = init_browser()
 
 #JPL Scraping (1)
-    url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
-    browser.visit(url)
+        url = 'https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars'
+        browser.visit(url)
 
-    time.sleep(1)
+        time.sleep(1)
 
-    html = browser.html
-    soup = bs(html, 'html.parser')
+        html = browser.html
+        soup = bs(html, 'html.parser')
 
-    button = soup.find('footer', class_='button fancybox')
-    browser.click_link_by_partial_text('FULL IMAGE')
+        button = soup.find('footer', class_='button fancybox')
+        browser.click_link_by_partial_text('FULL IMAGE')
 
-    locate = soup.find(class_='carousel_item')['style']
-    new_url = locate.split("'")[1]
-    featured_image_url = 'https://www.jpl.nasa.gov' + new_url
+        locate = soup.find(class_='carousel_item')['style']
+        new_url = locate.split("'")[1]
+        featured_image_url = 'https://www.jpl.nasa.gov' + new_url
 
-    print(featured_image_url) #This needs to be appended to a dictionary
+        print(featured_image_url) #This needs to be appended to a dictionary
 
-#Twitter Scraping (2)
-    twitter_url = "https://twitter.com/marswxreport?lang=en"
-    browser.visit(twitter_url)
+        #News Scraping (2)
+        url = 'https://mars.nasa.gov/news/?page=0&per_page=40&order=publish_date+desc%2Ccreated_at+desc&search=&category=19%2C165%2C184%2C204&blank_scope=Latest'
+        response = requests.get(url)
 
-    time.sleep(1)
+        soup = bs(response.text, 'lxml')
 
-    html = browser.html
-    soup = bs(html, "html.parser")
+        news_title = soup.find(class_='content_title').text
+        print(news_title)
 
-    mars_weather = soup.find(class_="TweetTextSize TweetTextSize--normal js-tweet-text tweet-text").text
+        # Retrieve the paragraph text
+        news_p = soup.find(class_='rollover_description_inner').text
+        print(news_p)
 
-    print(mars_weather)
-#Space Facts Scraping (3)
+        #Twitter Scraping (3)
+        twitter_url = "https://twitter.com/marswxreport?lang=en"
+        browser.visit(twitter_url)
 
-    facts_url = 'https://space-facts.com/mars/'
-    browser.visit(facts_url)
+        time.sleep(1)
 
-    time.sleep(1)
+        html = browser.html
+        soup = bs(html, "html.parser")
 
-    tables = pd.read_html(facts_url)
+        mars_weather = soup.find(class_="TweetTextSize TweetTextSize--normal js-tweet-text tweet-text").text
 
-#Create scraped table into dataframe
-    df = tables[0]
-    df.columns = ['Feature', 'Description']
+        print(mars_weather)
+        #Space Facts Scraping (4)
 
-    html_table = df.to_html()
-    html_table
+        facts_url = 'https://space-facts.com/mars/'
+        browser.visit(facts_url)
 
-    print(html_table)
+        time.sleep(1)
 
-#USGS Image Scraping (4)
-    url_usgs = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
-    browser.visit(url_usgs)
+        tables = pd.read_html(facts_url)
 
-    time.sleep(1)
+        #Create scraped table into dataframe
+        df = tables[0]
+        df.columns = ['Feature', 'Description']
 
-    usgs_links = soup.find('a', class_='item')
-    browser.click_link_by_partial_text('Cerberus')
+        html_table = df.to_html()
+        html_table
 
+        print(html_table)
 
-    html = browser.html
-    soup = bs(html, 'html.parser')
+        #USGS Image Scraping (5)
+        url_usgs = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+        browser.visit(url_usgs)
 
-    links_with_text_1 = []
-    for a in soup.find_all('a', href=True):
-        if a.text:
-            links_with_text_1.append(a['href'])
+        time.sleep(1)
 
-    Cerberus = links_with_text_1[4]                                       
-
-    print(Cerberus)
-    browser.execute_script("window.history.go(-1)")
+        usgs_links = soup.find('a', class_='item')
+        browser.click_link_by_partial_text('Cerberus')
 
 
-    usgs_links = soup.find('a', class_='item')
-    browser.click_link_by_partial_text('Schiaparelli')
+        html = browser.html
+        soup = bs(html, 'html.parser')
 
-    html = browser.html
-    soup = bs(html, 'html.parser')
+        links_with_text_1 = []
+        for a in soup.find_all('a', href=True):
+                if a.text:
+                        links_with_text_1.append(a['href'])
 
-    links_with_text_2 = []
-    for a in soup.find_all('a', href=True):
-        if a.text:
-            links_with_text_2.append(a['href'])
-        
-    Schiaparelli = links_with_text_2[4]
-    print(Schiaparelli)
+        Cerberus = links_with_text_1[4]                                       
 
-    browser.execute_script("window.history.go(-1)")
+        print(Cerberus)
+        browser.execute_script("window.history.go(-1)")
 
-    usgs_links = soup.find('a', class_='item')
-    browser.click_link_by_partial_text('Syrtis')
 
-    html = browser.html
-    soup = bs(html, 'html.parser')
+        usgs_links = soup.find('a', class_='item')
+        browser.click_link_by_partial_text('Schiaparelli')
 
-    links_with_text_3 = []
-    for a in soup.find_all('a', href=True):
-        if a.text:
-            links_with_text_3.append(a['href'])
+        html = browser.html
+        soup = bs(html, 'html.parser')
 
-    Syrtis = (links_with_text_3[4])  
-    print(Syrtis)                     
+        links_with_text_2 = []
+        for a in soup.find_all('a', href=True):
+                if a.text:
+                        links_with_text_2.append(a['href'])
 
-    browser.execute_script("window.history.go(-1)")
+        Schiaparelli = links_with_text_2[4]
+        print(Schiaparelli)
 
-    usgs_links = soup.find('a', class_='item')
-    browser.click_link_by_partial_text('Valles')
+        browser.execute_script("window.history.go(-1)")
 
-    html = browser.html
-    soup = bs(html, 'html.parser')
+        usgs_links = soup.find('a', class_='item')
+        browser.click_link_by_partial_text('Syrtis')
 
-    links_with_text_4 = []
-    for a in soup.find_all('a', href=True):
-        if a.text:
-            links_with_text_4.append(a['href'])
+        html = browser.html
+        soup = bs(html, 'html.parser')
 
-    Valles = links_with_text_4[4]                     
-    print(Valles)
+        links_with_text_3 = []
+        for a in soup.find_all('a', href=True):
+                if a.text:
+                        links_with_text_3.append(a['href'])
 
-    browser.execute_script("window.history.go(-1)")
+        Syrtis = (links_with_text_3[4])  
+        print(Syrtis)                     
 
-    # Store data in a dictionary
-    mars_data = {
+        browser.execute_script("window.history.go(-1)")
+
+        usgs_links = soup.find('a', class_='item')
+        browser.click_link_by_partial_text('Valles')
+
+        html = browser.html
+        soup = bs(html, 'html.parser')
+
+        links_with_text_4 = []
+        for a in soup.find_all('a', href=True):
+                if a.text:
+                        links_with_text_4.append(a['href'])
+
+        Valles = links_with_text_4[4]                     
+        print(Valles)
+
+        browser.execute_script("window.history.go(-1)")
+
+        # Store data in a dictionary
+        mars_data = {
         "JPL_featured_img": featured_image_url,
         "mars_weather": mars_weather,
         "mars_facts": html_table,
         "Cerberus": Cerberus,
         "Schiaparelli": Schiaparelli,
         "Syrtis": Syrtis,
-        "Valles": Valles
+        "Valles": Valles,
+        "News_Title": news_title,
+        "News_p": news_p,
         }
 
-    # Close the browser after scraping
-    browser.quit()
+        # Close the browser after scraping
+        browser.quit()
 
-    return mars_data
+        return mars_data
 
-    
+if __name__ == '__main__':
+    scrape()
