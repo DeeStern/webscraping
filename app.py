@@ -11,11 +11,15 @@ mongo = PyMongo(app, uri="mongodb://localhost:27017/mars_db")
 
 @app.route("/")
 def home():
+        try:
         # Find one record of data from the mongo database
-        mars_db = mongo.db.mars_db.find_one()
+                mars_db = mongo.db.mars_db.find_one()
 
         # Return template and data
-        return render_template("index.html", mars_db=mars_db)
+                return render_template("index.html", mars_db=mars_db)
+
+        except:
+                print("Hi! Add /scrape to the end of this page's URL to get data!")
 
 # Route that will trigger the scrape function
 @app.route("/scrape")

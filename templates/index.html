@@ -20,7 +20,18 @@
     <h3>{{mars_db.News_Title}}</h3>
     <p>{{mars_db.News_p}}</p>
     <h2>Featured Image</h2>
-    <img src="{{ mars_db.JPL_featured_img }}" alt="Featured Image">
+
+    <div class="well text-center">
+      <div class="col-md-12"></div>
+      <div class="row">
+          <div class="col-md-6">
+              <img src="{{mars_db.JPL_featured_img}}" class="img-responsive fit-img" alt="Featured Image">
+          </div>
+      </div>
+</div>
+<br>
+<br>
+
     <h2>Current Weather on Mars</h2>
     <p>{{mars_db.mars_weather}}</p>
 
@@ -30,14 +41,28 @@
 <br>
 <br>
 
-    <img src="{{mars_db.Cerberus}}" alt="Hemisphere 1">
-    <img src="{{mars_db.Schiaparelli}}" alt="Hemisphere 2">
-    <img src="{{mars_db.Syrtis}}" alt="Hemisphere 3">
-    <img src="{{mars_db.Valles}}" alt="Hemisphere 4">
-  </div>
-  </div>
-</div>
-
+<div class="container">
+  <div class="well text-center">
+      <h2>Mars Hemispheres</h2>
+          <div class="row">
+              <div class="col-md-6">
+                  <img src="{{mars_db.Cerberus}}" class="img-responsive fit-img" alt="Mars Photo">
+              </div>
+              <div class="col-md-6">
+                  <img src="{{mars_db.Schiaparelli}}" class="img-responsive fit-img" alt="Mars Photo">
+              </div>
+          </div>
+      </div>
+      <div class="well text-center">
+              <div class="col-md-12"></div>
+              <div class="row">
+                  <div class="col-md-6">
+                      <img src="{{mars_db.Syrtis}}" class="img-responsive fit-img" alt="Mars Photo">
+                  </div>
+                  <div class="col-md-6">
+                      <img src="{{mars_db.Valles}}" class="img-responsive fit-img" alt="Mars Photo">
+                  </div>
+              </div>
+       </div>
+      </body>
 </body>
-
-</html>
